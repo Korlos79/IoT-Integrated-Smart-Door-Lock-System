@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-login: url('...'); /*Chèn ảnh bạn muốn*/
+            --bg-dashboard: url('...'); /*Chèn ảnh bạn muốn*/
+            --bg-account: url('...'); /*Chèn ảnh bạn muốn*/
+            --bg-history: url('...');/*Chèn ảnh bạn muốn*/
+
+            --primary: #4facfe;
+            --secondary: #00f2fe;
+            --glass-bg: rgba(0, 0, 0, 0.6); 
+            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+            --text-color: #fff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a1a;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        body.bg-style-login { background-image: var(--bg-login); }
+        body.bg-style-dashboard { background-image: var(--bg-dashboard); }
+        body.bg-style-account { background-image: var(--bg-account); }
+        body.bg-style-history { background-image: var(--bg-history); }
+
+        body::before {
+            content: ''; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4); z-index: -1;
+        }
+
+        /* --- CẤU HÌNH VỊ TRÍ --- */
+        #view-login {
+            display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+            height: 100vh; padding-left: 10%; width: 100%;
+        }
+
+        /* --- CHỈNH SỬA ĐỂ CĂN GIỮA CÁC TRANG TRONG --- */
+        .view-inner {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto; /* Căn giữa ngang */
+            animation: fadeIn 0.4s ease-in-out;
+            box-sizing: border-box;
+        }
+        .view-inner.active {
+            display: flex;
+            justify-content: center; /* Căn giữa dọc */
+            min-height: 100vh;       /* Chiếm toàn bộ chiều cao màn hình */
+            padding: 20px;           /* Khoảng cách an toàn */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- CARD STYLE --- */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px; border: var(--glass-border);
+            padding: 40px; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            width: 100%; max-width: 400px;
+        }
+
+        /* --- INPUTS & BUTTONS --- */
+        input {
+            width: 100%; padding: 15px; margin: 10px 0;
+            border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.1); color: white; transition: 0.3s;
+        }
+        input:focus { background: rgba(255,255,255,0.2); border-color: var(--primary); outline: none;}
+
+        .btn {
+            border: none; border-radius: 12px; padding: 15px 25px;
+            font-weight: 600; cursor: pointer; transition: 0.3s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; color: white; font-size: 16px;
+        }
+        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--secondary)); }
+        .btn-primary:hover { transform: translateY(-2px); }
+        
+        .btn-back {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3);
+            width: auto; margin-bottom: 20px; padding: 10px 20px; align-self: flex-start;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.1); }
+
+        /* --- DASHBOARD GRID --- */
+        .dashboard-grid {
+            display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 30px; width: 100%;
+        }
+        .big-btn {
+            background: var(--glass-bg); border: var(--glass-border);
+            border-radius: 25px; padding: 30px; text-align: center; cursor: pointer;
+            transition: all 0.3s; display: flex; flex-direction: column; align-items: center;
+        }
+        .big-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-5px); }
+        .big-btn i { font-size: 40px; margin-bottom: 15px; }
+        .big-btn span { font-size: 18px; font-weight: 600; }
+
+        .btn-door { color: #2ecc71; }
+        .btn-account { color: #f1c40f; }
+        .btn-history { color: #e056fd; }
+
+        .user-info {
+            display: flex; justify-content: space-between; align-items: center; width: 100%;
+            padding: 15px 25px; background: var(--glass-bg); border: var(--glass-border);
+            border-radius: 50px; margin-bottom: 20px;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(255,255,255,0.05); color: var(--secondary); }
+        
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: rgba(0,0,0,0.8); color: #fff;
+            text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 99;
+            left: 50%; bottom: 30px; transform: translateX(-50%); backdrop-filter: blur(5px);
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        .error { color: #ff6b6b; margin-top: 10px; display: none; }
+
+        @media (max-width: 768px) {
+            #view-login { align-items: center; padding-left: 0; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 769px) { .dashboard-grid { grid-template-columns: repeat(3, 1fr); } }
+    </style>
+</head>
+<body class="bg-style-login">
+
+    <div id="view-login">
+        <div class="card">
+            <div style="font-size: 60px; margin-bottom: 20px;">🐕‍🦺</div>
+            <h2>Smart Home</h2>
+            <p style="color: #ccc; margin-bottom: 30px;">Hệ thống điều khiển</p>
+            <input type="text" id="username" placeholder="Tên đăng nhập">
+            <input type="password" id="password" placeholder="Mật khẩu">
+            <button class="btn btn-primary" onclick="handleLogin()" style="margin-top: 20px;">
+                Đăng nhập <i class="fas fa-arrow-right"></i>
+            </button>
+            <p class="error" id="loginError">Thông tin sai!</p>
+        </div>
+    </div>
+
+    <div id="view-dashboard" class="view-inner">
+        <div class="user-info">
+            <span id="welcomeUser"><i class="fas fa-user-astronaut"></i> Xin chào!</span>
+            <button onclick="logout()" style="background:none; border:1px solid #ff6b6b; color:#ff6b6b; padding:8px 15px; border-radius:20px; cursor:pointer;">
+                <i class="fas fa-power-off"></i>
+            </button>
+        </div>
+        <div class="dashboard-grid">
+            <div class="big-btn btn-door" onclick="openDoorAction()">
+                <i class="fas fa-fingerprint"></i> <span>Mở Cửa</span>
+            </div>
+            <div class="big-btn btn-account" onclick="navigateTo('view-accounts')">
+                <i class="fas fa-users-cog"></i> <span>Tài Khoản</span>
+            </div>
+            <div class="big-btn btn-history" onclick="navigateTo('view-history')">
+                <i class="fas fa-history"></i> <span>Lịch Sử</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-accounts" class="view-inner">
+        <button class="btn btn-back" onclick="navigateTo('view-dashboard')"><i class="fas fa-arrow-left"></i> Quay lại</button>
+        <div class="card" style="max-width: 600px;">
+            <h3><i class="fas fa-user-plus"></i> Thêm User</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="newUsername" placeholder="User">
+                <input type="text" id="newPassword" placeholder="Pass">
+                <button class="btn btn-primary" onclick="addUser()" style="width:auto;">+</button>
+            </div>
+            <h3><i class="fas fa-list"></i> Danh sách</h3>
+            <div style="overflow-x: auto;">
+                <table id="userTable">
+                    <thead><tr><th>User</th><th>Role</th><th style="text-align:right">Xóa</th></tr></thead>
+                    <tbody id="userTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-history" class="view-inner">
+        <button class="btn btn-back" onclick="navigateTo('view-dashboard')"><i class="fas fa-arrow-left"></i> Quay lại</button>
+        <div class="card" style="max-width: 600px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3><i class="fas fa-clock"></i> Nhật ký</h3>
+                <button onclick="loadHistory()" style="background:none; border:none; color:#00f2fe; font-size:20px; cursor:pointer;"><i class="fas fa-sync-alt"></i></button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="logTable">
+                    <thead><tr><th>Thời gian</th><th>Người</th><th>Hành động</th></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                <p id="loadingText" style="margin-top:20px; color:#aaa"><i class="fas fa-spinner fa-spin"></i> Đang tải...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">Thông báo</div>
+
+    <script>
+        var espIP = "192.168.43.81"; 
+        var scriptURL = "https://script.google.com/macros/s/AKfycbwh7Sz-npJpBsQ9vFypzSC0v8T3vI5mKdvH0Zfo05bloNRFssQXXN27btn0NZQ1baQ6Pg/exec"; 
+        var currentUserRole = "";
+
+        function navigateTo(viewId) {
+            if(viewId === 'view-accounts' && currentUserRole !== 'admin') {
+                showToast("⛔ Bạn không có quyền truy cập!", "#e74c3c");
+                return;
+            }
+            document.getElementById('view-login').style.display = 'none';
+            document.querySelectorAll('.view-inner').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+
+            document.body.className = ''; 
+            if(viewId === 'view-dashboard') document.body.classList.add('bg-style-dashboard');
+            else if(viewId === 'view-accounts') document.body.classList.add('bg-style-account');
+            else if(viewId === 'view-history') document.body.classList.add('bg-style-history');
+            else document.body.classList.add('bg-style-login');
+
+            if(viewId === 'view-history') loadHistory();
+            if(viewId === 'view-accounts') loadUsers();
+        }
+
+        function handleLogin() {
+            var u = document.getElementById("username").value;
+            var p = document.getElementById("password").value;
+            var btn = document.querySelector("#view-login button");
+            var err = document.getElementById("loginError");
+
+            if(!u || !p) { err.style.display='block'; return; }
+            btn.innerHTML = '...'; err.style.display='none';
+
+            fetch(scriptURL + `?mode=login&user=${u}&pass=${p}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status == "success") {
+                    currentUserRole = data.role;
+                    document.getElementById("welcomeUser").innerHTML = `<i class="fas fa-user-astronaut"></i> Hi, ${u}`;
+                    navigateTo('view-dashboard'); 
+                } else {
+                    err.style.display='block'; btn.innerHTML='Đăng nhập <i class="fas fa-arrow-right"></i>';
+                }
+            })
+            .catch(() => { btn.innerHTML='Đăng nhập <i class="fas fa-arrow-right"></i>'; showToast("Lỗi Server!", "#e74c3c"); });
+        }
+
+        function logout() { location.reload(); }
+
+        function openDoorAction() {
+            showToast("⏳ Đang gửi lệnh...", "#f39c12");
+            fetch("http://" + espIP + "/OPEN", { mode: 'no-cors' })
+            .then(() => setTimeout(() => showToast("✅ Mở cửa thành công!", "#2ecc71"), 1000));
+        }
+
+        function loadHistory() {
+            var t = document.getElementById("tableBody");
+            var l = document.getElementById("loadingText");
+            t.innerHTML=""; l.style.display="block";
+            fetch(scriptURL+"?mode=read").then(r=>r.json()).then(d=>{
+                l.style.display="none";
+                d.forEach(r=>{
+                    var dt=new Date(r[0]);
+                    t.innerHTML+=`<tr><td>${dt.getHours()}:${dt.getMinutes()} <small>${dt.getDate()}/${dt.getMonth()+1}</small></td><td>${r[1]}</td><td>${r[2]}</td></tr>`;
+                });
+            });
+        }
+        function loadUsers() {
+            var t = document.getElementById("userTableBody");
+            t.innerHTML="<tr><td colspan='3'>...</td></tr>";
+            fetch(scriptURL+"?mode=getUsers").then(r=>r.json()).then(d=>{
+                t.innerHTML="";
+                d.forEach(u=>{
+                    var del = (u.user==='admin')?'-':`<i class="fas fa-trash" style="color:#ff6b6b;cursor:pointer" onclick="delUser('${u.user}')"></i>`;
+                    t.innerHTML+=`<tr><td>${u.user}</td><td>${u.role}</td><td style="text-align:right">${del}</td></tr>`;
+                });
+            });
+        }
+        function addUser(){
+            var u=document.getElementById("newUsername").value, p=document.getElementById("newPassword").value;
+            if(!u||!p) return showToast("Thiếu info!","#e74c3c");
+            fetch(scriptURL+`?mode=addUser&user=${u}&pass=${p}&role=user`).then(r=>r.json()).then(d=>{
+                if(d.status=="success"){ showToast("Đã thêm!","#2ecc71"); loadUsers(); }
+                else showToast("Tồn tại!","#f39c12");
+            });
+        }
+        function delUser(u){ if(confirm("Xóa?")) fetch(scriptURL+`?mode=deleteUser&user=${u}`).then(r=>r.json()).then(d=>{if(d.status=="success")loadUsers()}); }
+        function showToast(m,c){var x=document.getElementById("toast");x.innerText=m;x.style.backgroundColor=c||"#333";x.className="show";setTimeout(()=>x.className="",3000);}
+    </script>
+</body>
+</html>
